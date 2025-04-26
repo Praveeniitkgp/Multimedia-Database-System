@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css"/></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />  
+    <title>VSM</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        .flex_container {
+            display: flex;
+            justify-content: space-between;            
+        }
+        #tf_idf, #list_of_sources {
+            margin: 1em;
+        }
+        #list_of_sources {
+            margin-left: 10em;
+        }
+        .modal {
+            color: black;
+        }
+        .modal h3, .modal h4, .modal strong {
+            color: black;
+        }
+        .close_link:hover {
+            color:darkred;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted white; /* If you want dots under the hoverable text */
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 8em;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            padding: 5px 0;
+            border-radius: 6px;
+            
+            position: absolute;
+            z-index: 1;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -4em; /* Use half of the width (120/2 = 60), to center the tooltip */
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+        input[type="text"] {
+            margin-right: 2em;
+        }
+        .search_row {
+            transition: background 2s linear;
+            -webkit-transition: background 2s linear;
+            -moz-transition: background 2s linear;            
+        }
+        .back {
+            visibility: hidden;
+        }
+        #search {
+            margin: 2em;
+        }
+        .flex_container_back {
+            display: flex;
+            justify-content: space-between; 
+        }
+        .flex_container_back>table {
+            flex:1;
+            margin: 2em;
+        }
+        .flex_container_back>div {
+            flex:1;
+            margin: 2em;
+        }
+        #posting_list{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            margin: 2em;
+            flex: 1;
+
+        }
+
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <section id="main" class="wrapper">
+            <div class="inner">
+                <div id="toc_container">
+                    <h2 class="toc_title">Vector Space Model</h2>
+                </div>
+
+                <div id="card">
+                    <div class="front">
+                        <div id="search" class="flex_container">
+                            <input type="text">
+                            <a href="#" class="button" id="search_button">Search</a>
+                        </div>
+                        <div class="flex_container">
+
+                            <table class="alt" id="tf_idf">
+                                <thead>            
+                                    <tr>
+                                        <th>
+                                            <p>&nbsp;</p>
+                                        </th>
+                                        <th>
+                                            <p>1</p>
+                                        </th>
+                                        <th>
+                                            <p>2</p>
+                                        </th>
+                                        <th>
+                                            <p>3</p>
+                                        </th>
+                                        <th>
+                                            <p>4</p>
+                                        </th>
+                                        <th>
+                                            <p>5</p>
+                                        </th>
+                                        <th>
+                                            <p>6</p>
+                                        </th>
+                                        <th>
+                                            <p>7</p>
+                                        </th>
+                                        <th>
+                                            <p>8</p>
+                                        </th>
+                                    </tr>        
+                                </thead>
+                                <tbody>
+                                    <tr class="search_row">
+                                        <th>
+                                            <p>water</p>
+                                        </th>
+                                        <td>
+                                            <div class="tooltip">0.6
+                                                <span class="tooltiptext">1 * log(8/2)</span>
+                                            </div>                                
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">0.6
+                                                <span class="tooltiptext">1 * log(8/2)</span>
+                                            </div>                                   
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                    </tr>
+                                    <tr class="search_row">
+                                        <th>
+                                            <p>wave</p>
+                                        </th>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">3.01
+                                                <span class="tooltiptext">5 * log(8/2)</span>
+                                            </div>                                   
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">13.2
+                                                <span class="tooltiptext">22 * log(8/2)</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <p>baby</p>
+                                        </th>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">2.7
+                                                <span class="tooltiptext">3 * log(8/1)</span>
+                                            </div>                                
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <p>god</p>
+                                        </th>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">0.6
+                                                <span class="tooltiptext">1 * log(8/2)</span>
+                                            </div>                                  
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">0.6
+                                                <span class="tooltiptext">1 * log(8/2)</span>
+                                            </div>                                   
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                    </tr>
+                                    <tr class="search_row">
+                                        <th>
+                                            <p>ship</p>
+                                        </th>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">3.61
+                                                <span class="tooltiptext">6 * log(8/2)</span>
+                                            </div>                                   
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">1.8
+                                                <span class="tooltiptext">3 * log(8/2)</span>
+                                            </div>                                  
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <p>woman</p>
+                                        </th>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">0.6
+                                                <span class="tooltiptext">1 * log(8/2)</span>
+                                            </div>                                   
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">2.4
+                                                <span class="tooltiptext">4 * log(8/2) </span>
+                                            </div>                                 
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <p>nature</p>
+                                        </th>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                        <td>
+                                            <div class="tooltip">0.9
+                                                <span class="tooltiptext">1 * log(8/1)</span>
+                                            </div>                                 
+                                        </td>
+                                        <td>
+                                            <p>0</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div id="list_of_sources">
+                                <ol>
+                                    <li><a href="#leonardo_modal" rel="modal:open">Virgin of the Rocks, Leonardo da Vinci</a></li>
+                                    <li><a href="#botticelli_modal" rel="modal:open">The Birth of Venus, Sandro Botticelli</a></li>
+                                    <li><a href="#giorgione_modal" rel="modal:open">The Tempest, Giorgione</a></li>
+                                    <li><a href="#gericault_modal" rel="modal:open">The Raft of the Medusa, Théodore Géricault</a></li>
+                                    <li><a href="#friedrich_modal" rel="modal:open">Woman at Window, Caspar David Friedrich</a></li>
+                                    <li><a href="#turner_modal" rel="modal:open">Norham Castle, Sunrise, William Turner</a></li>
+                                    <li><a href="#hokusai_modal" rel="modal:open">The Great Wave off Kanagawa, Katsushika Hokusai</a></li>
+                                    <li><a href="#cezanne_modal" rel="modal:open">The Bathers, Paul Cézanne</a></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="back">
+                        <div class="flex_container_back">
+                            <table class="alt">
+                                <thead>
+                                    <tr>
+                                        <th>Term</th>
+                                        <th>Ndocs</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>water</td>
+                                        <td id="water_from">2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>wave</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ship</td>
+                                        <td>2</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div id="posting_list">
+                                <h3>Posting lists</h3>
+                                <table class="alt">
+                                    <thead>
+                                        <tr>
+                                            <th>Doc#</th>
+                                            <th>W<sub>i,j</sub></th>
+                                            <th>Water</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td id="water_to">1</td>
+                                            <td>0.6</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>0.6</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="alt">
+                                    <thead>
+                                        <tr>
+                                            <th>Doc#</th>
+                                            <th>W<sub>i,j</sub></th>
+                                            <th>Wave</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>3.01</td>
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>13.2</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="alt">
+                                    <thead>
+                                        <tr>
+                                            <th>Doc#</th>
+                                            <th>W<sub>i,j</sub></th>
+                                            <th>Ship</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>3.31</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>1.8 </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                        <div class="flex_container_back">
+                            <div>
+                                <h3>Merged list</h3>
+                                <table class="alt">
+                                    <thead>
+                                        <tr>
+                                            <th>Doc#</th>
+                                            <th>sim</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>0.6</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>3.01 + 3.61 = 6.62</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>0.6 + 1.8 = 2.4</td>
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>13.2</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div>
+                                <h3>Sorted for decreasing value list</h3>
+                                <table class="alt">
+                                    <thead>
+                                        <tr>
+                                            <th>Doc#</th>
+                                            <th>sim</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>13,2</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>6,62</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>2,40</td>
+                                        </tr>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>0.6</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3>Answer to the query</h3>
+                        <ol>
+                            <li>The Great Wave off Kanagawa, Katsushika Hokusai</li>
+                            <li>The Raft of the Medusa, Théodore Géricault</li>
+                            <li>Woman at Window, Caspar David Friedrich</li>
+                            <li>Virgin of the Rocks, Leonardo da Vinci</li>
+                        </ol>
+                    </div>
+
+
+                </div>  
+
+                <!-- The Modals -->
+                <div id="leonardo_modal" class="modal">
+                    <span class="image fit">
+                        <h3>Virgin of the Rocks, Leonardo da Vinci (1483-1486)</h3>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Leonardo_Da_Vinci_-_Vergine_delle_Rocce_%28Louvre%29.jpg/800px-Leonardo_Da_Vinci_-_Vergine_delle_Rocce_%28Louvre%29.jpg" alt="Virgin of the Rocks, Leonardo da Vinci">
+                    </span>
+                    <h4>Introduction</h4>
+                    <p>The Virgin of the Rocks (Italian: Vergine delle rocce; sometimes the Madonna of the Rocks) is the name of two paintings by Italian artist Leonardo da Vinci, of the same subject, and of a composition which is identical except for several significant details. The version generally considered the prime version, the earlier of the two, is unrestored and hangs in The Louvre in Paris. The other, which was restored between 2008-2010, hangs in the National Gallery, London. The paintings are both nearly 2 metres (over 6 feet) high and are painted in oils. Both were originally painted on wooden panel, but the Louvre version has been transferred to canvas.
+                        Both paintings show the Madonna and child Jesus with the infant John the Baptist and an angel Uriel, in a rocky setting which gives the paintings their usual name. The significant compositional differences are in the gaze and right hand of the angel. There are many minor ways in which the works differ, including the colours, the lighting, the flora, and the way in which sfumato has been used. Although the date of an associated commission is documented, the complete histories of the two paintings are unknown, and lead to speculation about which of the two is earlier.
+                        Two further paintings are associated with the commission: side panels each containing an angel playing a musical instrument and completed by associates of Leonardo. These are both in the National Gallery, London
+                    </p>
+                    <h4>Description</h4>
+                    <p>
+                        The two paintings of the Virgin of the Rocks, that now belonging to the National Gallery, London, and that belonging to the Louvre Museum, Paris, are the same in subject matter and in overall composition, indicating that one is derivative of the other. The two paintings differ in compositional details, in colour, in lighting and in the handling of the paint. Both paintings show a grouping of four figures, the Virgin Mary, the Christ child, the infant John the Baptist and an angel arranged into a triangular composition within the painting and set against a background of rocks, and a distant landscape of mountains and <strong>water</strong>. In both paintings, Mary makes the apex of the pyramidal figure group, stretching one hand to include John and raising the other above the head of the Christ child in a blessing. John kneels, gazing towards the Christ child with his hands together in an attitude of prayer. The Christ child sits towards the front of the painting, supported by the angel, and raising his right hand in a sign of Benediction towards the kneeling John.
+                        Compositionally, all the figures are slightly larger in the London painting than in the Louvre painting. The main compositional difference between the two paintings is that while in the London painting, the angel’s right hand rests on his/her knee, in the Louvre painting the hand is raised, the index finger pointing at John. The eyes of the angel are turned down in a contemplative manner in the London painting, but in the Louvre picture are turned to gaze in the general direction of the viewer.
+                        In the London painting, all the forms are more defined, including the bodily forms of the clothed figures. The rocks are painted in meticulous detail, while the forms of the background in the painting in the Louvre are all more hazy. The contrast between light and shade on the figures and faces in the London painting are all much sharper. The faces and forms in the Louvre painting are more delicately painted and subtly blurred by sfumato. The lighting in the Louvre painting is softer and appears warmer, but this may be the result of the tone of the varnish on the surface. In keeping with their conservative handling of Leonardo's works, the Louvre version has not undergone significant restoration or cleaning. The Louvre painting remains much as it was in 1939 when Kenneth Clark lamented that "We can form no real conception of the colour, the values, or the general tone of the original, buried as it is under layer upon layer of thick yellow varnish. In the darks some mixture of bitumen has made the surface cake and crack like mud, and there are innumerable patches of old repaint all over the picture. All this must be borne in mind before we say that at this date Leonardo was a dark painter and an uninteresting colourist."
+                        Another difference is in the colouring of the robes, particularly those of the angel. The London painting contains no red, while in the Louvre painting, the angel is robed in bright red and green, with the robes arranged differently from those of the angel in London. The London version contains traditional attributes missing from the Louvre version, the haloes and John's traditional cruciform reed staff. Davies says it is "not certain" if these details which are painted in gold are contemporary with the painting or have been added by a later artist. The details of the flowers are also quite different in the two paintings, with those in the Louvre painting being botanically accurate, and those in the London painting being fanciful creations.
+                        The two paintings of angels that are associated with the Virgin of the Rocks and are in the National Gallery do not properly fulfil the original commission for two panels each showing four angels, singing on one side and playing musical instruments on the other. There are only two musicians, both turned the same direction and both playing musical instruments. One, in green, plays a vielle, and the other, in red, plays a lute. The positions of the feet and the drapery are similar, indicating that the same design has in part been utilised for both. The angel in red is thought to be the work of Ambrogio de Predis. The angel in green is the work of an unknown associate of Leonardo. The National Gallery suggests that it might be the work of Francesco Napoletano.
+                        In both cases the angel is standing in a grey painted niche. A reflectogram of the Angel in green with a Vielle revealed part of a painted landscape. The background of the Angel in red with a Lute could not be determined because the grey paint on that painting is thick and opaque. While it is commonly thought that the two angel panels were originally placed on either side of the central panel, an article published by the National Gallery suggests that they were placed higher up on the altarpiece.
+                    </p>
+                    <a href="#" rel="modal:close" class="close_link">Close</a>
+                </div>            
+                <div id="botticelli_modal" class="modal">
+                    <span class="image fit">
+                        <h3>The Birth of Venus, Sandro Botticelli (1485)</h3>
+                        <img src="https://images.uffizi.it/production/attachments/1503909239806647-605174-2-.jpg?ixlib=rails-2.1.3&w=1200&h=800&fit=clip&crop=center&fm=gjpg&auto=compress">
+                    </span>
+                    <h4>Introduction</h4>
+                    <p>
+                        The Birth of Venus (Italian: Nascita di Venere ) is a painting by the Italian artist Sandro Botticelli, probably made in the mid 1480s. It depicts the goddess Venus arriving at the shore after her birth, when she had emerged from the sea fully-grown (called Venus Anadyomene and often depicted in art). The painting is in the Uffizi Gallery in Florence, Italy.
+                        Although the two are not a pair, the painting is inevitably discussed with Botticelli's other very large mythological painting, the Primavera, also in the Uffizi. They are among the most famous paintings in the world, and icons of the Italian Renaissance; of the two, the Birth is better known than the Primavera. As depictions of subjects from classical mythology on a very large scale they were virtually unprecedented in Western art since classical antiquity, as was the size and prominence of a nude female figure in the Birth. It used to be thought that they were both commissioned by the same member of the Medici family, but this is now uncertain.
+                        They have been endlessly analysed by art historians, with the main themes being: the emulation of ancient painters and the context of wedding celebrations (generally agreed), the influence of Renaissance Neo-Platonism (somewhat controversial), and the identity of the commissioners (not agreed). Most art historians agree, however, that the Birth does not require complex analysis to decode its meaning, in the way that the Primavera probably does. While there are subtleties in the painting, its main meaning is a straightforward, if individual, treatment of a traditional scene from Greek mythology, and its appeal is sensory and very accessible, hence its enormous popularity.
+                    <h4>Description</h4>
+                    <p>
+                        In the centre the newly-born goddess Venus stands nude in a giant scallop shell. Its size is purely imaginary, and is also found in classical depictions of the subject. At the left the wind <strong>god</strong> Zephyr blows at her, with the wind shown by lines radiating from his mouth. He is in the air, and carries a young female, who is also blowing, but less forcefully. Both have wings. Vasari was probably correct in identifying her as "Aura", personification of a lighter breeze. Their joint efforts are blowing Venus towards the shore, and blowing the hair and clothes of the other figures to the right.
+                        At the right a female figure who may be floating slightly above the ground holds out a rich cloak or dress to cover Venus when she reaches the shore, as she is about to do. She is one of the three Horae or Hours, Greek minor goddesses of the seasons and of other divisions of time, and attendants of Venus. The floral decoration of her dress suggests she is the Hora of Spring.
+                        Alternative identifications for the two secondary female figures involve those also found in the Primavera; the nymph held by Zephyr may be Chloris, a flower nymph he married in some versions of her story, and the figure on land may be Flora. Flora is generally the Roman equivalent of the Greek Chloris; in the Primavera Chloris is transformed into the figure of Flora next to her, following Ovid's Fasti, but it is hard to see that such a transformation is envisaged here. However, the roses blown along with the two flying figures would be appropriate for Chloris.
+                        The subject is not strictly the "Birth of Venus", a title given to the painting only in the nineteenth century (though given as the subject by Vasari), but the next scene in her story, where she arrives on land, blown by the wind. The land probably represents either Cythera or Cyprus, both Mediterranean islands regarded by the Greeks as territories of Venus.
+                    </p>
+                    <a href="#" rel="modal:close" class="close_link">Close</a>
+                </div>   
+                <div id="giorgione_modal" class="modal">
+                    <span class="image fit">
+                        <h3>The Tempest, Giorgione (1508)</h3>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Giorgione_019.jpg/800px-Giorgione_019.jpg">
+                    </span>
+                    <h4>Introduction</h4>
+                    <p>
+                        The Tempest (Italian La Tempesta) is a Renaissance painting by the Italian master Giorgione dated between 1506 and 1508. Originally commissioned by the Venetian noble Gabriele Vendramin, the painting is now in the Gallerie dell'Accademia of Venice, Italy. Despite considerable discussion by art historians, the meaning of the scene remains elusive. 
+                    <h4>Description</h4>
+                    <p>
+                        On the right a <strong>woman</strong> sits, suckling a <strong>baby</strong>. The <strong>woman</strong> has been described as a "Gypsy" since at least 1530, and in Italy, the painting is also known as La Zingara e il Soldato ("The Gypsy woman and the soldier"), or as La Zingarella e il Soldato ("The Gypsy girl and the soldier"). Her pose is unusual – normally the <strong>baby</strong> would be held on the mother's lap; but in this case the <strong>baby</strong> is positioned at the side of the mother, so as to expose her pubic area. A man, possibly a soldier, holding a long staff or pike, stands in contrapposto on the left. He smiles and glances to the left, but does not appear to be looking at the <strong>woman</strong>. Art historians have identified the man alternatively as a soldier, a shepherd, a gypsy, or a member of a club of unmarried men. X-rays of the painting have revealed that in the place of the man, Giorgione originally painted another female nude. One may also note the stork on the rooftop on the right. Storks sometimes represent the love of parents for their children.
+                        The painting's features seem to anticipate the storm. The colors are subdued and the lighting soft; greens and blues dominate. The landscape is a not a mere backdrop, but forms a notable contribution to early landscape painting. The painting has a 'silent' atmosphere which continues to fascinate modern viewers.
+                        There is no contemporary textual explanation for The Tempest, and ultimately, no definitive reading or interpretation. To some it represents the flight into Egypt; to others, a scene from classical mythology (possibly Paris and Oenone; or Iasion and Demeter) or from an ancient Greek pastoral novel. According to the Italian scholar Salvatore Settis, the desert city would represent the Paradise, the two characters being Adam and Eve with their son Cain: the lightning, as in ancient Greek and Hebrew times, would represent <strong>god</strong> who has just ousted them from Eden. Others have proposed a moral allegorical reading, or concluded that Giorgione had no particular subject in mind.
+                        In September, 1943, Professor Pasquale Rotondi, Central Inspector for the General Direction of the Arts, put it under his bed to hide it from German troops..
+                    </p>
+                    <a href="#" rel="modal:close" class="close_link">Close</a>
+                </div>  
+                <div id="gericault_modal" class="modal">
+                    <span class="image fit">
+                        <h3>The Raft of the Medusa, Théodore Géricault (1818-1819)</h3>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg">
+                    </span>
+                    <h4>Introduction</h4>
+                    <p>
+                        The Raft of the Medusa (French: Le Radeau de la Méduse ) – originally titled Scène de Naufrage (Shipwreck Scene) – is an oil painting of 1818–19 by the French Romantic painter and lithographer Théodore Géricault (1791–1824). Completed when the artist was 27, the work has become an icon of French Romanticism. At 491 by 716 cm (16 ft 1 in by 23 ft 6 in), it is an over-life-size painting that depicts a moment from the aftermath of the wreck of the French naval frigate Méduse, which ran aground off the coast of today's Mauritania on 2 July 1816. On 5 July 1816, at least 147 people were set adrift on a hurriedly constructed raft; all but 15 died in the 13 days before their rescue, and those who survived endured starvation and dehydration and practised cannibalism. The event became an international scandal, in part because its cause was widely attributed to the incompetence of the French captain.
+                        Géricault chose to depict this event in order to launch his career with a large-scale uncommissioned work on a subject that had already generated great public interest. The event fascinated him, and before he began work on the final painting, he undertook extensive research and produced many preparatory sketches. He interviewed two of the survivors and constructed a detailed scale model of the raft. He visited hospitals and morgues where he could view, first-hand, the colour and texture of the flesh of the dying and dead. As he had anticipated, the painting proved highly controversial at its first appearance in the 1819 Paris Salon, attracting passionate praise and condemnation in equal measure. However, it established his international reputation and today is widely seen as seminal in the early history of the Romantic movement in French painting.
+                        Although The Raft of the Medusa retains elements of the traditions of history painting, in both its choice of subject matter and its dramatic presentation, it represents a break from the calm and order of the prevailing Neoclassical school. Géricault's work attracted wide attention from its first showing and was then exhibited in London. The Louvre acquired it soon after the artist's death at the age of 32. The painting's influence can be seen in the works of Eugène Delacroix, J. M. W. Turner, Gustave Courbet, and Édouard Manet.
+                    <h4>Description</h4>
+                    <p>
+                        The Raft of the Medusa portrays the moment when, after 13 days adrift on the raft, the remaining 15 survivors view a <strong>ship</strong> approaching from a distance. According to an early British reviewer, the work is set at a moment when "the ruin of the raft may be said to be complete". The painting is on a monumental scale of 491 cm × 716 cm (193 in × 282 in), so that most of the figures rendered are life-sized and those in the foreground almost twice life-size, pushed close to the picture plane and crowding onto the viewer, who is drawn into the physical action as a participant.
+                        The makeshift raft is shown as barely seaworthy as it rides the deep waves, while the men are rendered as broken and in utter despair. One old man holds the corpse of his son at his knees; another tears his hair out in frustration and defeat. A number of bodies litter the foreground, waiting to be swept away by the surrounding waves. The men in the middle have just viewed a rescue <strong>ship</strong>; one points it out to another, and an African crew member, Jean Charles, stands on an empty barrel and frantically waves his handkerchief to draw the <strong>ship</strong>'s attention.
+                        The pictorial composition of the painting is constructed upon two pyramidal structures. The perimeter of the large mast on the left of the canvas forms the first. The horizontal grouping of dead and dying figures in the foreground forms the base from which the survivors emerge, surging upward towards the emotional peak, where the central figure waves desperately at a rescue <strong>ship</strong>.
+                        The viewer's attention is first drawn to the centre of the canvas, then follows the directional flow of the survivors' bodies, viewed from behind and straining to the right. According to the art historian Justin Wintle, "a single horizontal diagonal rhythm  us from the dead at the bottom left, to the living at the apex." Two other diagonal lines are used to heighten the dramatic tension. One follows the mast and its rigging and leads the viewer's eye towards an approaching <strong>wave</strong> that threatens to engulf the raft, while the second, composed of reaching figures, leads to the distant silhouette of the Argus, the <strong>ship</strong> that eventually rescued the survivors.
+                        Géricault's palette is composed of pallid flesh tones, and the murky colours of the survivors' clothes, the sea and the clouds. Overall the painting is dark and relies largely on the use of sombre, mostly brown pigments, a palette that Géricault believed was effective in suggesting tragedy and pain. The work's lighting has been described as "Caravaggesque", after the Italian artist closely associated with tenebrism—the use of violent contrast between light and dark. Even Géricault's treatment of the sea is muted, being rendered in dark greens rather than the deep blues that could have afforded contrast with the tones of the raft and its figures. From the distant area of the rescue <strong>ship</strong>, a bright light shines, providing illumination to an otherwise dull brown scene.
+                    </p>
+                    <a href="#" rel="modal:close" class="close_link">Close</a>
+                </div>  
+                <div id="friedrich_modal" class="modal">
+                    <span class="image fit">
+                        <h3>Woman at Window, Caspar David Friedrich (1822)</h3>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Caspar_David_Friedrich_018.jpg/800px-Caspar_David_Friedrich_018.jpg">
+                    </span>
+                    <h4>Introduction</h4>
+                    <p>
+                        <strong>Woman</strong> at a Window is an oil painting of 1822 by the German Romantic artist Caspar David Friedrich. This painting is currently located in Alte Nationalgalerie, Berlin.
+                    <h4>Description</h4>
+                    <p>
+                        Like many of his paintings, there’s only the back view of a figure. The painting depicts his wife at his studio in Dresden. Although the painting only shows her back, it allows the viewers to imagine what she sees. The view that starts to form is that she lives in a constricted environment and the only access of the outside world is through the window. A port with some ships, <strong>water</strong>, a coastline, and trees starts to appear. There’s also a view of the sky, but covered by the window above her. The <strong>ship</strong> that is passing slowly symbolizes how she is watching her life slowly passing by before her. The <strong>ship</strong> will be moving on while she is still stuck in the domestic environment. We get a sense that she wants more out of her life, just like most of Friedrich’s paintings. In addition, there’s also a sense of quietness and restriction in this painting, but it’s not because this room is small. The room is in fact a very large space with high ceiling and big windows.
+                        The painting has perfect verticals and horizontals line throughout. The <strong>woman</strong> is a contrast of this painting because she’s the only part that doesn’t fit into this geometric painting. Like many of his painting, Friedrich broke the order and symmetry by adding some sort of figure. In this case, he added the <strong>woman</strong>. Her body is slightly tilted to the left, breaking the geometry with her curvature. Adding the soft light sky and trees makes the <strong>woman</strong> stand out even more. From her posture to the lighting of the room shows what she has experienced throughout her life.
+                    </p>
+                    <a href="#" rel="modal:close" class="close_link">Close</a>
+                </div>  
+                <div id="turner_modal" class="modal">
+                    <span class="image fit">
+                        <h3>Norham Castle, Sunrise, William Turner (1845)</h3>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Joseph_Mallord_William_Turner_-_Norham_Castle%2C_Sunrise_-_WGA23182.jpg/1280px-Joseph_Mallord_William_Turner_-_Norham_Castle%2C_Sunrise_-_WGA23182.jpg">
+                    </span>
+                    <h4>Introduction</h4>
+                    <p>
+                        Norham Castle, Sunrise is an oil on canvas painting by English painter J. M. W. Turner, created around 1845. The painting was bequeathed to the National Gallery of British Art (now Tate Britain) as part of the Turner Bequest in 1856. It remains in the collection to this day.                        <h4>Description</h4>
+                    <p>
+                        Norham is a village in Northumberland, England in the border country between England and Scotland. The castle was a key stronghold overlooking the River Tweed and was frequently attacked by the Scots. Turner visited the castle and the surrounding country in 1797. Following his journey, Turner created the watercolor Norham Castle: Sunrise, which was exhibited at the Royal Academy of Arts in 1798 to critical acclaim. Turner revisted the ruins in 1801. In 1806, Turner began work on his Liber Studiorum, a collection of monochrome landscape prints. Norham Castle, Sunrise was among a series of unfinished colored reworkings of these prints. The source for this painting in particular was the Tate Collection's Liber catalogue's plate no. 57, Norham Castle on the Tweed, published in 1816.
+                    </p>
+                    <a href="#" rel="modal:close" class="close_link">Close</a>
+                </div>  
+                <div id="hokusai_modal" class="modal">
+                    <span class="image fit">
+                        <h3>The Great Wave off Kanagawa, Katsushika Hokusai (1829-1833)</h3>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Tsunami_by_hokusai_19th_century.jpg">
+                    </span>
+                    <h4>Introduction</h4>
+                    <p>
+                        The Great <strong>wave</strong> off Kanagawa (神奈川沖浪裏, Kanagawa-oki Nami Ura, lit. "Under a <strong>wave</strong> off Kanagawa"), also known as The Great <strong>wave</strong> or simply The <strong>wave</strong>, is a woodblock print by the Japanese ukiyo-e artist Hokusai. It was published sometime between 1829 and 1833 in the late Edo period as the first print in Hokusai's series Thirty-six Views of Mount Fuji. It is Hokusai's most famous work and one of the most recognizable works of Japanese art in the world.
+                        The image depicts an enormous <strong>wave</strong> threatening three fishing boats off the coast of the town of Kanagawa (the present-day city of Yokohama, Kanagawa Prefecture) while Mount Fuji rises in the background. While sometimes assumed to be a tsunami, the <strong>wave</strong> is more likely to be a large rogue <strong>wave</strong>. As in many of the prints in the series, it depicts the area around Mount Fuji under particular conditions, and the mountain itself appears in the background. Throughout the series are dramatic uses of Berlin blue pigment.
+                        Original impressions of the print are in many Western collections, including the Metropolitan Museum of Art, the British Museum, the Art Institute of Chicago, the Los Angeles County Museum of Art, the National Gallery of Victoria in Melbourne, and in Claude Monet's home in Giverny, France, among many other collections.
+                    <p>
+                        This print is a yoko-e, that is, a landscape format produced to the ōban size, about 25 cm(10 in) high by 37 cm (15 in) wide.
+                        The composition comprises three main elements: the sea whipped up by a storm, three boats and a mountain. It includes the signature in the upper left-hand corner.
+                        The mountain The mountain with a snow-capped peak is Mount Fuji, which in Japan is considered sacred and a symbol of national identity, as well as a symbol of beauty. Mount Fuji is an iconic figure in many Japanese representations of famous places (meisho-e), as is the case in Hokusai's series of Thirty-six Views of Mount Fuji, which opens with the present scene.
+                        The dark color around Mount Fuji seems to indicate that the scene occurs early in the morning, with the sun rising from behind the observer, illuminating the mountain's snowy peak. While cumulonimbus storm clouds seem to be hanging in the sky between the viewer and Mount Fuji, no rain is to be seen either in the foreground scene or on Mount Fuji, which itself appears completely cloudless.
+                        Boats In the scene there are three oshiokuri-bune, fast boats that are used to transport live fish from the Izu and Bōsō peninsulas to the markets of the bay of Edo. As the name of the piece indicates the boats are in Kanagawa prefecture, with Tokyo to the north, Mt Fuji to the northwest, the bay of Sagami to the south and the bay of Tokyo to the east. The boats, oriented to the southeast, are returning to the capital.
+                        There are eight rowers per boat, clinging to their oars. There are two more passengers in the front of each boat, bringing the total number of human figures in the image to thirty. Using the boats as reference, one can approximate the size of the <strong>wave</strong>: the oshiokuri-bune were generally between 12 and 15 meters (39–49 ft) long, and noting that Hokusai stretched the vertical scale by 30%, the <strong>wave</strong> must be between 10 and 12 meters (33–39 ft) tall.
+                        Sea and waves The sea dominates the composition as an extending <strong>wave</strong> about to break. In the moment captured in this image, the <strong>wave</strong> forms a circle around the center of the design, framing Mount Fuji in the background.
+                        Edmond de Goncourt described the <strong>wave</strong> in this way:
+                        The drawing of the <strong>wave</strong> is a deification of the sea made by a painter who lived with the religious terror of the overwhelming ocean completely surrounding his country; He is impressed by the sudden fury of the ocean's leap toward the sky, by the deep blue of the inner side of the curve, by the splash of its claw-like crest as it sprays forth droplets.
+                        Andreas Ramos, a writer, notes:
+                        ... a seascape with Fuji. The waves form a frame through which we see the mountain. The gigantic <strong>wave</strong> is a yin yang of empty space beneath the mountain. The inevitable breaking that we await creates a tension in the picture. In the foreground, a small <strong>wave</strong> forming a miniature Fuji is reflected by the distant mountain, itself shrunk in perspective. The little <strong>wave</strong> is larger than the mountain. The small fishermen cling to thin fishing boats, slide on a sea-mount looking to dodge the <strong>wave</strong>. The violent Yang of <strong>nature</strong> is overcome by the yin of the confidence of these experienced fishermen. Strangely, despite a storm, the sun shines high.
+                        SignatureThe Great <strong>wave</strong> off Kanagawa has two inscriptions. The first, within a rectangular cartouche in the top-left corner is the series title: "冨嶽三十六景/神奈川冲/浪裏" Fugaku Sanjūrokkei / Kanagawa oki / nami ura, which translates as "Thirty-six Views of Mount Fuji / Offshore from Kanagawa / Beneath the <strong>wave</strong>". The second inscription, to the left, is the artist's signature: 北斎改爲一筆 Hokusai aratame Iitsu hitsu, ("From the brush of Hokusai, changing his name to Iitsu").
+                        Over his career, Hokusai used more than 30 different names, always beginning a new cycle of works by changing it, and letting his students use the previous name.
+                        In his work Thirty-Six Views of Mount Fuji he used four distinct signatures, changing it according to the phase of the work: Hokusai aratame Iitsu hitsu, zen Hokusai Iitsu hitsu, Hokusai Iitsu hitsu and zen saki no Hokusai Iitsu hitsu.
+                    </p>
+                    <a href="#" rel="modal:close" class="close_link">Close</a>
+                </div>  
+                <div id="cezanne_modal" class="modal">
+                    <span class="image fit">
+                        <h3>The Bathers, Paul Cézanne (1898-1905)</h3>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/25/Paul_C%C3%A9zanne%2C_French_-_The_Large_Bathers_-_Google_Art_Project.jpg">
+                    </span>
+                    <h4>Introduction</h4>
+                    <p>
+                        The Bathers (French: Les Grandes Baigneuses) is an oil painting by French artist Paul Cézanne first exhibited in 1906. The painting, which is exhibited in the Philadelphia Museum of Art, is the largest of a series of Bather paintings by Cézanne; the others are in the Museum of Modern Art in New York City, National Gallery, London, the Barnes Foundation, Philadelphia, and the Art Institute of Chicago. Occasionally referred to as the Big Bathers or Large Bathers to distinguish it from the smaller works, the painting is considered one of the masterpieces of modern art, and is often considered Cézanne's finest work
+                    <p>
+                        Cézanne worked on the painting for seven years, and it remained unfinished at the time of his death in 1906. The painting was purchased in 1937 for $110,000 with funds from a trust fund for the Philadelphia Museum of Art by their major benefactor, Joseph E. Widener. It was previously owned by Leo Stein.
+                        With each version of the Bathers, Cézanne moved away from the traditional presentation of paintings, intentionally creating works that would not appeal to the novice viewer. He did this to avoid fleeting fads and give a timeless quality to his work, and in so doing paved the way for future artists to disregard current trends and paint pieces that would appeal equally to all generations. The abstract nude females present in Large Bathers give the painting tension and density. It is exceptional among his work in symmetrical dimensions, with the adaptation of the nude forms to the triangular pattern of the trees and river. Using the same technique as employed in painting landscapes and still lifes, Large Bathers is reminiscent of the work of Titian and Peter Paul Rubens. Comparisons are also often made with the other famous group of nude women of the same period, Picasso's Les Demoiselles d'Avignon.
+                        The purchase of the painting, while generally praised, was nevertheless questioned by The Philadelphia Record, which noted that 41,000 (or ten percent) of Philadelphia's residents were without bathtubs, and that the money could therefore have been better spent elsewhere. While Cézanne's drawing ability has always been criticized, a critic once said that he "made the ineptly drawn Bathers a warm evocation of leisurely summer bliss." The painting was featured in the BBC Two series 100 Great Paintings.
+                    </p>
+                    <a href="#" rel="modal:close" class="close_link">Close</a>
+                </div>  
+            </div>
+        </section>
+    </div>
+
+<!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>  
+
+<!-- jQuery Modal -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+
+<!-- jQuery Flip -->
+<script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
+
+<script>
+    $("#card").flip({
+        trigger: 'manual'
+    });    
+    $("#search_button").click(function(){
+        $(".search_row").css("background-color", "purple")
+        setTimeout(function(){
+            $("#card").flip(true, {reverse: true, speed: 5000000000});
+            $(".back").css("visibility", "visible")
+            $(".front").css("visibility", "hidden")
+        }, 3000);
+    })
+
+</script>
+
+</body>
+</html>
